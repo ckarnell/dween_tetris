@@ -67,7 +67,7 @@ int nScreenWidth = 80;			// Console Screen Size X (columns)
 int nScreenHeight = 30;			// Console Screen Size Y (rows)
 wstring tetromino[7];
 int nFieldWidth = 10 + 2; // 10 + 2 for the sides
-int nFieldHeight = 20 + 1; // 20 + 1 for the bottom border
+int nFieldHeight = 20 + 1; // 20, + 1 for the bottom border
 unsigned char *pField = nullptr;
 
 /* Boolean isPressed( unsigned short inKeyCode ) */
@@ -147,13 +147,13 @@ int main()
 	
   // Tetronimos 4x4
   /*
-  XXXX
   ....
+  XXXX
   ....
   ....
   */
 	/* tetromino[0].append(L"..X...X...X...X."); // I */
-	tetromino[0].append(L"XXXX............"); // I
+	tetromino[0].append(L"....XXXX........"); // I
 
   /*
   .X..
@@ -164,44 +164,44 @@ int main()
 	tetromino[1].append(L".X..XXX........."); //  T
 
   /*
-  .XX.
-  .XX.
   ....
+  .XX.
+  .XX.
   ....
   */
-	tetromino[2].append(L".XX..XX........."); // O
+	tetromino[2].append(L".....XX..XX....."); // O
 
   /*
+  ....
   XX..
   .XX.
   ....
-  ....
   */
-	tetromino[3].append(L"XX...XX........."); // Z
+	tetromino[3].append(L"....XX...XX....."); // Z
 
   /*
+  ....
   .XX.
   XX..
   ....
-  ....
   */
-	tetromino[4].append(L".XX.XX.........."); // S
+	tetromino[4].append(L".....XX.XX......"); // S
 
   /*
+  ....
   ..X.
   XXX.
   ....
-  ....
   */
-	tetromino[5].append(L"..X.XXX........."); // L
+	tetromino[5].append(L"......X.XXX....."); // L
 
   /*
+  ....
   X...
   XXX.
   ....
-  ....
   */
-	tetromino[6].append(L"X...XXX........."); // J
+	tetromino[6].append(L"....X...XXX....."); // J
 
 	pField = new unsigned char[nFieldWidth*nFieldHeight]; // Create play field buffer
 	for (int x = 0; x < nFieldWidth; x++) // Board Boundary
@@ -213,10 +213,9 @@ int main()
 
 	// Game Logic
 	bool bKey[4];
-	/* int nCurrentPiece = rand() % 7; */
 	int nCurrentPiece = -1;
 	int nCurrentRotation = 0;
-	int nCurrentX = (nFieldWidth / 2) - 2;
+	int nCurrentX = (nFieldWidth / 2) - 2; // Subtract 2 to offset piece width, which is 4
 	int nCurrentY = 0;
 	int nSpeed = 20;
 	int nSpeedCount = 0;
