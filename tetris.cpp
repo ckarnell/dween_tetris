@@ -57,6 +57,7 @@
 #include <thread>
 #include <vector>
 #include <time.h>
+#include <random>
 /* #include <Carbon/Carbon.h> */
 using namespace std;
 
@@ -135,6 +136,18 @@ bool DoesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY)
 	return true;
 }
 
+vector<int> CreateNewBag() 
+{
+  int arr[] = {0, 1, 2, 3, 4, 5, 6};
+  int n = sizeof(arr) / sizeof(arr[0]);
+  /* vector<int> orderedBag{0, 1, 2, 3, 4, 5, 6}; */
+  vector<int> orderedBag(arr, arr + n);
+  /* orderedBag = [0, 1, 2, 3, 4, 5, 6]; */
+  std::random_shuffle (orderedBag.begin(), orderedBag.end());
+  return orderedBag;
+}
+
+
 int main()
 {
 	// Create Screen Buffer
@@ -156,12 +169,12 @@ int main()
 	tetromino[0].append(L"....XXXX........"); // I
 
   /*
+  ....
   .X..
   XXX.
   ....
-  ....
   */
-	tetromino[1].append(L".X..XXX........."); //  T
+	tetromino[1].append(L".....X..XXX....."); //  T
 
   /*
   ....
@@ -216,15 +229,17 @@ int main()
 	int nCurrentPiece = -1;
 	int nCurrentRotation = 0;
 	int nCurrentX = (nFieldWidth / 2) - 2; // Subtract 2 to offset piece width, which is 4
-	int nCurrentY = 0;
+	int nCurrentY = 0 - 1;
 	int nSpeed = 20;
 	int nSpeedCount = 0;
 	bool bForceDown = false;
 	bool bRotateHold = true;
 	int nPieceCount = 0;
 	int nScore = 0;
+	int currentBagIndex = 0;
 	vector<int> vLines;
 	bool bGameOver = false;
+  vector<int> pieceBag = CreateNewBag();
 
 	while (!bGameOver) // Main Loop
 	{
@@ -233,7 +248,9 @@ int main()
       // is the only way to make it not choose the J piece first.
       nCurrentPiece = rand() % 7;
       nCurrentPiece = rand() % 7;
+      nCurrentPiece = pieceBag[currentBagIndex];
     }
+
 		// Timing =======================
 		/* this_thread::sleep_for(50ms); // Small Step = 1 Game Tick */
 		nSpeedCount++;
@@ -305,9 +322,15 @@ int main()
 
 				// Pick New Piece
 				nCurrentX = nFieldWidth / 2 - 2; // Subtract 2 to offset piece width, which is 4
-				nCurrentY = 0;
+				nCurrentY = 0 - 1;
 				nCurrentRotation = 0;
-				nCurrentPiece = rand() % 7;
+
+        currentBagIndex++;
+        if (currentBagIndex == 7) {
+          currentBagIndex = 0;
+          pieceBag = CreateNewBag();
+        }
+				nCurrentPiece = pieceBag[currentBagIndex];
 
 				// If piece does not fit straight away, game over!
 				bGameOver = !DoesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY);
@@ -325,7 +348,7 @@ int main()
 		for (int px = 0; px < 4; px++)
 			for (int py = 0; py < 4; py++)
 				if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.')
-					screen[(nCurrentY + py + 2)*nScreenWidth + (nCurrentX + px + 2)] = nCurrentPiece + 65;
+          screen[(nCurrentY + py + 2)*nScreenWidth + (nCurrentX + px + 2)] = nCurrentPiece + 65;
 
 		// Draw Score
     // TODO: Remove or replace write function
@@ -364,11 +387,12 @@ int main()
     }
     cout << endl << endl<< endl<< endl<< endl<< endl<< endl<< endl;
 
-    for (long i = 999999; i > 0; i--) {
+    for (long i = 9999999; i > 0; i--) {
       // Fake ass way of delaying timing
     }
     /* for (int i = screen - 1; i >= 0; i--) */ 
     /*   cout << array[i]; */
+
 	}
 
 	// Oh Dear
