@@ -1,4 +1,6 @@
 /* NOTE TO SELF: Run with `g++ -std=c++11 -o tetrisprog tetris.cpp && ./tetrisprog` */
+/* Compile with debugger with `g++ -std=c++11 -g -o tetrisprog tetris.cpp` */
+/* Debug with `sudo gdb ./tetrisprog` */
 /*
 	OneLoneCoder.com - Command Line Tetris
 	"Put Your Money Where Your Mouth Is" - @Javidx9
@@ -67,7 +69,8 @@ using namespace std;
 
 int nScreenWidth = 80;			// Console Screen Size X (columns)
 int nScreenHeight = 30;			// Console Screen Size Y (rows)
-wstring tetromino[7];
+/* typedef std::shared_ptr<Tetromino> TetrominoPtr; */
+vector<Tetromino*> tetromino;
 int nFieldWidth = 10 + 2; // 10 + 2 for the sides
 int nFieldHeight = 20 + 1; // 20, + 1 for the bottom border
 unsigned char *pField = nullptr;
@@ -104,25 +107,25 @@ int Rotate(int px, int py, int r)
 	int pi = 0;
 	switch (r % 4)
 	{
-	case 0: // 0 degrees			// 0  1  2  3
-		pi = py * 4 + px;			// 4  5  6  7
-		break;						// 8  9 10 11
-									//12 13 14 15
+	case 0: // 0 degrees			  //  0  1  2  3
+		pi = py * 4 + px;			    //  4  5  6  7
+		break;						        //  8  9 10 11
+									            // 12 13 14 15
 
-	case 1: // 90 degrees			//12  8  4  0
-		pi = 12 + py - (px * 4);	//13  9  5  1
-		break;						//14 10  6  2
-									//15 11  7  3
+	case 1: // 90 degrees			  // 12  8  4  0
+		pi = 12 + py - (px * 4);	// 13  9  5  1
+		break;						        // 14 10  6  2
+									            // 15 11  7  3
 
 	case 2: // 180 degrees			//15 14 13 12
 		pi = 15 - (py * 4) - px;	//11 10  9  8
-		break;						// 7  6  5  4
-									// 3  2  1  0
+		break;						        // 7  6  5  4
+									            // 3  2  1  0
 
 	case 3: // 270 degrees			// 3  7 11 15
 		pi = 3 - py + (px * 4);		// 2  6 10 14
-		break;						// 1  5  9 13
-	}								// 0  4  8 12
+		break;						        // 1  5  9 13
+	}								            // 0  4  8 12
 
 	return pi;
 }
@@ -134,7 +137,8 @@ bool DoesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY)
 		for (int py = 0; py < 4; py++)
 		{
 			// Get index into piece
-			int pi = Rotate(px, py, nRotation);
+      int pi = py * 4 + px;	//  TODO: Does this work?
+			/* int pi = Rotate(px, py, nRotation); */
 
 			// Get index into field
 			int fi = (nPosY + py) * nFieldWidth + (nPosX + px);
@@ -148,7 +152,9 @@ bool DoesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY)
 				if (nPosY + py >= 0 && nPosY + py < nFieldHeight)
 				{
 					// In Bounds so do collision check
-					if (tetromino[nTetromino][pi] != L'.' && pField[fi] != 0)
+          /* if (tetromino[nTetromino][pi] != L'.' && pField[fi] != 0) */
+          wstring currentString = getStringFromPieceOrientationVector(tetromino[nTetromino] -> getPieceOrientation(nRotation));
+					if (currentString[pi] != L'.' && pField[fi] != 0)
 						return false; // fail on first hit
 				}
 			}
@@ -182,62 +188,13 @@ int main()
 	/* DWORD dwBytesWritten = 0; */
 	
   // Tetronimos 4x4
-  /*
-  ....
-  XXXX
-  ....
-  ....
-  */
-	/* tetromino[0].append(L"..X...X...X...X."); // I */
-	tetromino[0].append(L"....XXXX........"); // I
-
-  /*
-  ....
-  .X..
-  XXX.
-  ....
-  */
-	tetromino[1].append(L".....X..XXX....."); //  T
-
-  /*
-  ....
-  .XX.
-  .XX.
-  ....
-  */
-	tetromino[2].append(L".....XX..XX....."); // O
-
-  /*
-  ....
-  XX..
-  .XX.
-  ....
-  */
-	tetromino[3].append(L"....XX...XX....."); // Z
-
-  /*
-  ....
-  .XX.
-  XX..
-  ....
-  */
-	tetromino[4].append(L".....XX.XX......"); // S
-
-  /*
-  ....
-  ..X.
-  XXX.
-  ....
-  */
-	tetromino[5].append(L"......X.XXX....."); // L
-
-  /*
-  ....
-  X...
-  XXX.
-  ....
-  */
-	tetromino[6].append(L"....X...XXX....."); // J
+	tetromino.push_back(new TPiece);
+	tetromino.push_back(new SPiece);
+	tetromino.push_back(new ZPiece);
+	tetromino.push_back(new JPiece);
+	tetromino.push_back(new LPiece);
+	tetromino.push_back(new IPiece);
+	tetromino.push_back(new OPiece);
 
 	pField = new unsigned char[nFieldWidth*nFieldHeight]; // Create play field buffer
 	for (int x = 0; x < nFieldWidth; x++) // Board Boundary
@@ -281,10 +238,12 @@ int main()
 		// Input ========================
     /* char inputVar; */
 		for (int k = 0; k < 4; k++)								// R   L   D Z
+    {
       // TODO: Implement user input
       /* cin >> inputVar; */
       /* cout << inputVar; */
 			/* bKey[k] = (0x8000 & GetAsyncKeyState((unsigned char)("\x27\x25\x28Z"[k]))) != 0; */
+    }
 		
 		// Game Logic ===================
 
@@ -319,8 +278,14 @@ int main()
 				// It can't! Lock the piece in place
 				for (int px = 0; px < 4; px++)
 					for (int py = 0; py < 4; py++)
-						if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.')
+          {
+            int pi = py * 4 + px;	//  TODO: Does this work?
+						/* if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.') */
+						if (getStringFromPieceOrientationVector(tetromino[nCurrentPiece] -> getPieceOrientation(nCurrentRotation))[pi] != L'.')
+            {
 							pField[(nCurrentY + py) * nFieldWidth + (nCurrentX + px)] = nCurrentPiece + 1;
+            }
+          }
 
 				// Check for lines
 				for (int py = 0; py < 4; py++)
@@ -369,8 +334,42 @@ int main()
 		// Draw Current Piece
 		for (int px = 0; px < 4; px++)
 			for (int py = 0; py < 4; py++)
-				if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] != L'.')
+      {
+        int pi = py * 4 + px;	//  TODO: Does this work?
+        Tetromino* currentPiece = tetromino[nCurrentPiece];
+        vector<vector<int>  > currentPieceOrientation = currentPiece -> getPieceOrientation(nCurrentRotation);
+        /* cout << "HOW WE HERE?" << endl; */
+        /* for (int j = 0; j < currentPieceOrientations.size(); j++) { */
+        /*   for (int k = 0; k < currentPieceOrientations[j].size(); k++) { */
+        /*     cout << currentPieceOrientations[j][k]; */
+        /*   } */
+        /*   cout << endl; */
+        /* } */
+        /* print(currentPieceOrientations) */
+        /* cout << currentPieceOrientations */
+
+
+
+
+
+        /* vector<vector<int> > currentPieceOrientation = currentPieceOrientations[nCurrentRotation]; */
+
+
+
+
+
+
+        wstring stringFromPieceOrientationVector = getStringFromPieceOrientationVector(currentPieceOrientation);
+
+
+
+
+
+				if (stringFromPieceOrientationVector[pi] != L'.')
+        {
           screen[(nCurrentY + py + 2)*nScreenWidth + (nCurrentX + px + 2)] = nCurrentPiece + 65;
+        }
+      }
 
 		// Draw Score
     // TODO: Remove or replace write function

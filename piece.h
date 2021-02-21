@@ -9,14 +9,14 @@ using namespace std;
 class Tetromino {
   public:
     vector<vector<int> > coordinates;
-    int orientation;
+    int orientation = 0;
     vector<int> bottomLeftMostCord;
     vector<int> centerCoord;
     const vector<vector<vector<int> > > orientations;
-    string symbol;
+    wstring symbol;
     string color;
 
-    void rotate(bool clockwise) {
+    virtual void rotate(bool clockwise) {
       if (clockwise) {
         orientation++;
       } else {
@@ -24,15 +24,19 @@ class Tetromino {
       }
     }
 
-    vector<vector<int> > getPieceOrientation() {
+    virtual vector<vector<int> > getPieceOrientation(int orientation) {
       return orientations[orientation];
     }
 };
 
 class TPiece: public Tetromino {
   public:
-    string symbol = "T";
+    wstring symbol = L"T";
     string color = "purple";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -64,8 +68,12 @@ class TPiece: public Tetromino {
 
 class SPiece: public Tetromino {
   public:
-    string symbol = "S";
+    wstring symbol = L"S";
     string color = "green";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -97,8 +105,12 @@ class SPiece: public Tetromino {
 
 class ZPiece: public Tetromino {
   public:
-    string symbol = "Z";
+    wstring symbol = L"Z";
     string color = "red";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -130,8 +142,12 @@ class ZPiece: public Tetromino {
 
 class IPiece: public Tetromino {
   public:
-    string symbol = "I";
+    wstring symbol = L"I";
     string color = "cyan";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -163,8 +179,12 @@ class IPiece: public Tetromino {
 
 class LPiece: public Tetromino {
   public:
-    string symbol = "L";
+    wstring symbol = L"L";
     string color = "orange";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -196,8 +216,12 @@ class LPiece: public Tetromino {
 
 class JPiece: public Tetromino {
   public:
-    string symbol = "J";
+    wstring symbol = L"J";
     string color = "blue";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -229,8 +253,12 @@ class JPiece: public Tetromino {
 
 class OPiece: public Tetromino {
   public:
-    string symbol = "O";
+    wstring symbol = L"O";
     string color = "yellow";
+
+    vector<vector<int> > getPieceOrientation(int orientation) {
+      return orientations[orientation];
+    }
 
     const vector<vector<vector<int> > > orientations = {
       {
@@ -259,5 +287,44 @@ class OPiece: public Tetromino {
       }
     };
 };
+
+class PieceBag {
+  public:
+    IPiece iPiece = IPiece();
+    TPiece tPiece = TPiece();
+    JPiece jPiece = JPiece();
+    LPiece lPiece = LPiece();
+    OPiece oPiece = OPiece();
+    SPiece sPiece = SPiece();
+    ZPiece zPiece = ZPiece();
+
+    template <typename T>
+    T getPiece(int index) {
+      switch (index) {
+        case 0 :
+          return iPiece;
+        case 1 :
+          return tPiece;
+        case 2 :
+          return jPiece;
+        case 3 :
+          return lPiece;
+        case 4 :
+          return oPiece;
+        case 5 :
+          return sPiece;
+        case 6 :
+          return zPiece;
+        /* TPiece tPiece = TPiece(); */
+        /* JPiece jPiece = JPiece(); */
+        /* LPiece lPiece = LPiece(); */
+        /* OPiece oPiece = OPiece(); */
+        /* SPiece sPiece = SPiece(); */
+        /* ZPiece zPiece = ZPiece(); */
+      }
+      return iPiece;
+    }
+};
+
 
 #endif
