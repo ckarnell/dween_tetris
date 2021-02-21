@@ -1,4 +1,4 @@
-/* NOTE TO SELF: Run with `g++ -o tetrisprog tetris.cpp && ./tetrisprog` */
+/* NOTE TO SELF: Run with `g++ -std=c++11 -o tetrisprog tetris.cpp && ./tetrisprog` */
 /*
 	OneLoneCoder.com - Command Line Tetris
 	"Put Your Money Where Your Mouth Is" - @Javidx9
@@ -58,6 +58,7 @@
 #include <vector>
 #include <time.h>
 #include <random>
+#include "piece.h"
 /* #include <Carbon/Carbon.h> */
 using namespace std;
 
@@ -70,6 +71,26 @@ wstring tetromino[7];
 int nFieldWidth = 10 + 2; // 10 + 2 for the sides
 int nFieldHeight = 20 + 1; // 20, + 1 for the bottom border
 unsigned char *pField = nullptr;
+
+wstring getStringFromPieceOrientationVector(vector<vector<int> > pieceOrientationVector)
+{
+  wstring result = L"";
+  for (int i=0; i < pieceOrientationVector.size(); i++)
+  {
+    for (int j=0; j < pieceOrientationVector[i].size(); j++)
+    {
+      int currentPixle = pieceOrientationVector[i][j];
+      if (currentPixle == 0) {
+        wstring nextChar = L".";
+        result.push_back(nextChar[0]);
+      } else {
+        wstring nextChar = L"X";
+        result.push_back(nextChar[0]);
+      }
+    }
+  }
+  return result;
+}
 
 /* Boolean isPressed( unsigned short inKeyCode ) */
 /* { */
@@ -136,6 +157,8 @@ bool DoesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY)
 	return true;
 }
 
+int myrandom (int i) { return std::rand()%i;}
+
 vector<int> CreateNewBag() 
 {
   int arr[] = {0, 1, 2, 3, 4, 5, 6};
@@ -143,7 +166,7 @@ vector<int> CreateNewBag()
   /* vector<int> orderedBag{0, 1, 2, 3, 4, 5, 6}; */
   vector<int> orderedBag(arr, arr + n);
   /* orderedBag = [0, 1, 2, 3, 4, 5, 6]; */
-  std::random_shuffle (orderedBag.begin(), orderedBag.end());
+  std::random_shuffle (orderedBag.begin(), orderedBag.end(), myrandom);
   return orderedBag;
 }
 
@@ -226,7 +249,6 @@ int main()
 
 	// Game Logic
 	bool bKey[4];
-	int nCurrentPiece = -1;
 	int nCurrentRotation = 0;
 	int nCurrentX = (nFieldWidth / 2) - 2; // Subtract 2 to offset piece width, which is 4
 	int nCurrentY = 0 - 1;
@@ -239,17 +261,17 @@ int main()
 	int currentBagIndex = 0;
 	vector<int> vLines;
 	bool bGameOver = false;
+
+  // This next line seems necessary to "kick off" actual randomness,
+  // otherwise the first piece is always the same. Very weird.
+  myrandom(7);
+
+  // Create the ordering of the first set of 7 pieces.
   vector<int> pieceBag = CreateNewBag();
+  int nCurrentPiece = pieceBag[currentBagIndex];
 
 	while (!bGameOver) // Main Loop
 	{
-    if (nCurrentPiece == -1) {
-      // For some reason calling this twice on the first iteration
-      // is the only way to make it not choose the J piece first.
-      nCurrentPiece = rand() % 7;
-      nCurrentPiece = rand() % 7;
-      nCurrentPiece = pieceBag[currentBagIndex];
-    }
 
 		// Timing =======================
 		/* this_thread::sleep_for(50ms); // Small Step = 1 Game Tick */
@@ -379,6 +401,8 @@ int main()
     /* wcout << screen << endl; */
     /* wprintf (screen); */
     /* bGameOver = true; */
+    /* cout << @"\x1bc"; */
+    /* cout << '\033c'; */
     for (long i = 0; i < nScreenWidth * nScreenHeight; i++) {
       if (i % nScreenWidth == 0) {
         cout << endl;
@@ -387,7 +411,7 @@ int main()
     }
     cout << endl << endl<< endl<< endl<< endl<< endl<< endl<< endl;
 
-    for (long i = 9999999; i > 0; i--) {
+    for (long i = 999999; i > 0; i--) {
       // Fake ass way of delaying timing
     }
     /* for (int i = screen - 1; i >= 0; i--) */ 
